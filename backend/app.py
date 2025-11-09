@@ -208,6 +208,15 @@ def electric_emissions_detailed():
         df["탄소배출량"] = df["총 사용 전력량"] * 0.4517  # default 계수
     return jsonify(df.to_dict(orient="records"))
 
+# Frontend Routes
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/<path:page_name>')
+def page(page_name):
+    return render_template(f'{page_name}.html')
+
 # 서버 실행
 if __name__ == '__main__':
     app.run(debug=True, port=5173)
