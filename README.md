@@ -1,139 +1,139 @@
-# Carbon Footprint Dashboard for Pukyong National University
+# 부경대학교 탄소 발자국 대시보드
 
-## 🚀 Project Overview
+## 🚀 프로젝트 개요
 
-The **Carbon Footprint Dashboard for Pukyong National University** is a robust, real-time monitoring and decision-support system engineered to accelerate the university's journey towards carbon neutrality. This platform integrates and analyzes data from five critical emission sources—vehicles, waste, water, electricity, and green spaces—providing a holistic view of the campus's environmental impact. By leveraging sophisticated analytical models, including Marginal Abatement Cost Curve (MACC) analysis, the dashboard empowers stakeholders with actionable insights to formulate cost-effective carbon reduction strategies.
+**부경대학교 탄소 발자국 대시보드**는 대학의 탄소 중립 목표 달성을 가속화하기 위해 설계된 실시간 모니터링 및 의사결정 지원 시스템입니다. 이 플랫폼은 차량, 폐기물, 물, 전력, 녹지 등 5가지 주요 배출원의 데이터를 통합하고 분석하여 캠퍼스의 환경 영향을 전체적으로 파악할 수 있도록 합니다. 한계 저감 비용 곡선(MACC) 분석을 포함한 정교한 분석 모델을 활용하여, 대시보드는 이해관계자들이 비용 효율적인 탄소 감축 전략을 수립할 수 있도록 실행 가능한 통찰력을 제공합니다.
 
-This project stands as a testament to data-driven environmental stewardship, transforming raw data into strategic intelligence for sustainable campus management.
+이 프로젝트는 데이터를 기반으로 한 환경 관리의 증거로서, 원시 데이터를 지속 가능한 캠퍼스 관리를 위한 전략적 인텔리전스로 변환합니다.
 
-## 📈 Business & Environmental Impact
+## 📈 비즈니스 및 환경 영향
 
-Our solution delivers tangible, quantifiable benefits, driving significant progress towards sustainability goals:
+우리의 솔루션은 다음과 같은 가시적이고 정량화 가능한 이점을 제공하여 지속 가능성 목표를 향한 상당한 진전을 이끌어냅니다:
 
--   **Precision Vehicle Emissions Tracking**: Real-time monitoring of **97,034 vehicles**, enabling granular analysis of transportation-related carbon output.
--   **Quantified Annual Emissions**: Accurately measures and reports an annual emission footprint of **11,184.54 tCO₂eq**, establishing a clear baseline for reduction efforts.
--   **Green Space Carbon Sequestration**: Visualizes the absorption capacity of campus greenery, accounting for **223.86 tCO₂eq**, highlighting the ecological value of natural assets.
--   **Optimized Energy Consumption**: Provides critical insights for **50+ buildings** on campus, facilitating the optimization of electricity usage patterns and reduction of energy waste.
--   **Strategic Abatement Planning**: Identifies and prioritizes **4 distinct reduction strategies** based on their Return on Investment (ROI), ensuring efficient allocation of resources for maximum environmental benefit.
+-   **정밀 차량 배출 추적**: **97,034대** 차량의 실시간 모니터링을 통해 교통 관련 탄소 배출량을 세부적으로 분석할 수 있습니다.
+-   **연간 배출량 정량화**: 연간 **11,184.54 tCO₂eq**의 배출량을 정확하게 측정하고 보고하여 감축 노력을 위한 명확한 기준선을 설정합니다.
+-   **녹지 탄소 흡수**: 캠퍼스 녹지의 흡수 능력을 시각화하여 **223.86 tCO₂eq**를 설명하고 자연 자산의 생태적 가치를 강조합니다.
+-   **최적화된 에너지 소비**: 캠퍼스 내 **50개 이상의 건물**에 대한 중요한 통찰력을 제공하여 전력 사용 패턴을 최적화하고 에너지 낭비를 줄일 수 있도록 합니다.
+-   **전략적 저감 계획**: 투자 수익률(ROI)을 기반으로 **4가지 뚜렷한 감축 전략**을 식별하고 우선순위를 지정하여 최대의 환경적 이익을 위한 자원의 효율적인 배분을 보장합니다.
 
-## 🛠️ Technical Stack & Architecture
+## 🛠️ 기술 스택 및 아키텍처
 
-Our architecture is designed for scalability, performance, and maintainability, utilizing a modern, efficient stack:
+우리의 아키텍처는 확장성, 성능 및 유지 관리성을 위해 설계되었으며 현대적이고 효율적인 스택을 활용합니다:
 
-### Backend
--   **Python 3.8+ / Flask 2.x**: A lightweight yet powerful web framework for building robust APIs.
--   **Pandas**: Employed for high-performance, large-scale time-series data processing and manipulation.
--   **RESTful API (7 Endpoints)**: Provides a clean, efficient interface for data retrieval and analysis, supporting various dashboard components.
+### 백엔드
+-   **Python 3.8+ / Flask 2.x**: 강력한 API를 구축하기 위한 경량의 웹 프레임워크.
+-   **Pandas**: 고성능, 대규모 시계열 데이터 처리 및 조작에 사용됩니다.
+-   **RESTful API (7개 엔드포인트)**: 다양한 대시보드 구성 요소를 지원하는 데이터 검색 및 분석을 위한 깨끗하고 효율적인 인터페이스를 제공합니다.
 
-### Frontend
--   **Vanilla JavaScript**: Chosen for optimal performance and minimal overhead, delivering a highly responsive user experience without framework dependencies.
--   **Tailwind CSS 2.x**: A utility-first CSS framework enabling rapid UI development and consistent, responsive design.
--   **Chart.js 3.7**: For creating interactive, dynamic data visualizations that make complex carbon data easily digestible.
--   **Leaflet 1.7**: A leading open-source JavaScript library for mobile-friendly interactive maps, crucial for geospatial data visualization.
+### 프론트엔드
+-   **Vanilla JavaScript**: 프레임워크 종속성 없이 고도로 반응적인 사용자 경험을 제공하기 위해 최적의 성능과 최소한의 오버헤드를 위해 선택되었습니다.
+-   **Tailwind CSS 2.x**: 신속한 UI 개발과 일관되고 반응적인 디자인을 가능하게 하는 유틸리티 우선 CSS 프레임워크.
+-   **Chart.js 3.7**: 복잡한 탄소 데이터를 쉽게 소화할 수 있도록 하는 대화형, 동적 데이터 시각화를 생성합니다.
+-   **Leaflet 1.7**: 지리 공간 데이터 시각화에 중요한 모바일 친화적인 대화형 지도를 위한 최고의 오픈 소스 JavaScript 라이브러리.
 
-### DevOps & Tools
--   **Git / GitHub**: Version control and collaborative development workflow.
--   **CSV-based Data Pipeline**: Efficiently processes and integrates diverse data sources into the system.
--   **CORS Support**: Ensures secure and flexible cross-origin resource sharing for seamless frontend-backend communication.
+### DevOps 및 도구
+-   **Git / GitHub**: 버전 관리 및 협업 개발 워크플로우.
+-   **CSV 기반 데이터 파이프라인**: 다양한 데이터 소스를 시스템에 효율적으로 처리하고 통합합니다.
+-   **CORS 지원**: 원활한 프론트엔드-백엔드 통신을 위한 안전하고 유연한 교차 출처 리소스 공유를 보장합니다.
 
-### System Architecture
+### 시스템 아키텍처
 ```
-[Data Sources] → [Flask API Layer] → [Frontend] → [User]
+[데이터 소스] → [Flask API 계층] → [프론트엔드] → [사용자]
      ↓              ↓                     ↓
-  5 CSV Files   Pandas Processing   Real-time Charts
-  (vehicle,     + REST APIs         + Interactive Maps
-   waste,                            + Responsive Design
-   water,
-   electric,
-   greenery)
+  5개의 CSV 파일   Pandas 처리        실시간 차트
+  (차량,         + REST API          + 대화형 지도
+   폐기물,                            + 반응형 디자인
+   물,
+   전력,
+   녹지)
 ```
 
-## 🔥 Key Features
+## 🔥 주요 기능
 
-### 1. Unified Dashboard
--   **Real-time KPI Monitoring**: Provides an immediate overview of total emissions, sequestration, net emissions, and daily emission trends.
--   **5-Sector Integrated View**: A single-page interface offering a comprehensive understanding of the entire carbon flow across all five monitored sectors.
--   **Cross-Filtering Capabilities**: Enables users to drill down into specific sectors and apply filters for detailed analysis and insights.
+### 1. 통합 대시보드
+-   **실시간 KPI 모니터링**: 총 배출량, 격리, 순 배출량 및 일일 배출 추세에 대한 즉각적인 개요를 제공합니다.
+-   **5개 부문 통합 보기**: 5개 모니터링 부문 전체의 전체 탄소 흐름을 포괄적으로 이해할 수 있는 단일 페이지 인터페이스.
+-   **교차 필터링 기능**: 사용자가 특정 부문으로 드릴다운하고 상세 분석 및 통찰력을 위해 필터를 적용할 수 있습니다.
 
-### 2. Vehicle Emissions Tracking
--   **Fuel-Type Segmentation**: Advanced algorithms differentiate emissions by fuel type (gasoline, diesel, LPG, hybrid), automatically excluding electric and hydrogen vehicles for precise accounting.
--   **Daily/Monthly Trend Analysis**: Offers dual-timeline comparisons to identify patterns and evaluate the effectiveness of reduction initiatives.
--   **Proprietary Emission Calculation Engine**:
+### 2. 차량 배출 추적
+-   **연료 유형별 세분화**: 고급 알고리즘은 연료 유형(가솔린, 디젤, LPG, 하이브리드)별로 배출량을 구별하여 정확한 회계를 위해 전기 및 수소 차량을 자동으로 제외합니다.
+-   **일별/월별 추세 분석**: 패턴을 식별하고 감축 이니셔티브의 효과를 평가하기 위해 이중 타임라인 비교를 제공합니다.
+-   **독점 배출 계산 엔진**:
     ```
-    Emission = (Distance / FuelEfficiency) × EmissionFactor × VehicleCount
+    배출량 = (주행 거리 / 연비) × 배출 계수 × 차량 수
     ```
-    This formula, based on industry standards, ensures accurate and reliable emission quantification.
+    업계 표준을 기반으로 한 이 공식은 정확하고 신뢰할 수 있는 배출량 정량화를 보장합니다.
 
-### 3. Waste Management System
--   **Comprehensive Waste Type Processing**: Handles three distinct waste categories: medical waste, designated waste, and industrial wastewater.
--   **CH₄ → CO₂eq Conversion Logic**: Adheres strictly to IPCC guidelines (GWP=28) for converting methane emissions to carbon dioxide equivalents.
--   **Disposal Method-Specific Calculation**: Utilizes separate algorithms for landfill and incineration processes to reflect varying emission profiles.
+### 3. 폐기물 관리 시스템
+-   **포괄적인 폐기물 유형 처리**: 의료 폐기물, 지정 폐기물 및 산업 폐수 등 세 가지 뚜렷한 폐기물 범주를 처리합니다.
+-   **CH₄ → CO₂eq 변환 논리**: 메탄 배출량을 이산화탄소 등가물로 변환하기 위해 IPCC 가이드라인(GWP=28)을 엄격하게 준수합니다.
+-   **처리 방법별 계산**: 다양한 배출 프로필을 반영하기 위해 매립 및 소각 공정에 대해 별도의 알고리즘을 활용합니다.
 
-### 4. Water-Induced Emissions
--   **Indirect Scope 2 Emissions Calculation**: Quantifies indirect emissions resulting from electricity consumption for water pumping and purification.
--   **Applied Power Consumption Unit**: Incorporates a precise power consumption unit of `0.3265 kWh/m³` for accurate calculations.
--   **Reverse Calculation Algorithm**: Achieves 99.9% accuracy in back-calculating water usage from emission data, providing robust validation.
+### 4. 물 유발 배출
+-   **간접 범위 2 배출량 계산**: 물 펌핑 및 정화를 위한 전력 소비로 인한 간접 배출량을 정량화합니다.
+-   **적용된 전력 소비 단위**: 정확한 계산을 위해 `0.3265 kWh/m³`의 정밀한 전력 소비 단위를 통합합니다.
+-   **역계산 알고리즘**: 배출 데이터에서 물 사용량을 역산하여 99.9%의 정확도를 달성하여 강력한 검증을 제공합니다.
 
-### 5. Green Space Carbon Accounting
--   **Tree-Specific Absorption Calculation**: Computes carbon absorption based on four distinct tree species and their individual counts.
--   **Double-Counting Prevention**: Implements logic to prevent redundant accounting between canopy area and individual tree absorption.
--   **Biomass Equation (IPCC Tier 2 Methodology)**:
+### 5. 녹지 탄소 회계
+-   **수종별 흡수량 계산**: 4가지 뚜렷한 수종과 개별 개체 수를 기반으로 탄소 흡수량을 계산합니다.
+-   **이중 계산 방지**: 수관 면적과 개별 나무 흡수량 간의 중복 회계를 방지하는 논리를 구현합니다.
+-   **바이오매스 방정식(IPCC Tier 2 방법론)**:
     ```
-    Absorption = ΔV × D × BEF × (1+R) × CF × (44/12) × Area
+    흡수량 = ΔV × D × BEF × (1+R) × CF × (44/12) × 면적
     ```
-    This advanced methodology ensures scientifically sound and globally recognized carbon sequestration reporting.
+    이 고급 방법론은 과학적으로 건전하고 세계적으로 인정된 탄소 격리 보고를 보장합니다.
 
-### 6. Power Consumption Geospatial Heatmap
--   **Real-time Visualization for 50+ Buildings**: Leverages Leaflet.js to display electricity consumption across campus buildings in real-time.
--   **Log-Scale Normalization**: Corrects for usage discrepancies, providing a clear and interpretable visualization of power consumption patterns.
--   **Monthly Interactive Filter**: Allows users to toggle between months (1-12) for seasonal analysis of energy usage.
--   **5-Stage Color Gradient**: Utilizes an intuitive color gradient (green to red) to instantly highlight areas of high and low energy consumption.
+### 6. 전력 소비 지리 공간 히트맵
+-   **50개 이상의 건물에 대한 실시간 시각화**: Leaflet.js를 활용하여 캠퍼스 건물 전체의 전력 소비를 실시간으로 표시합니다.
+-   **로그 스케일 정규화**: 사용량 불일치를 수정하여 전력 소비 패턴을 명확하고 해석 가능하게 시각화합니다.
+-   **월별 대화형 필터**: 사용자가 계절별 에너지 사용량 분석을 위해 월(1-12) 사이를 전환할 수 있습니다.
+-   **5단계 색상 그라데이션**: 직관적인 색상 그라데이션(녹색에서 빨간색)을 활용하여 높고 낮은 에너지 소비 영역을 즉시 강조 표시합니다.
 
-## 🚀 Getting Started
+## 🚀 시작하기
 
-To set up and run the Carbon Footprint Dashboard locally, follow these steps:
+탄소 발자국 대시보드를 로컬에서 설정하고 실행하려면 다음 단계를 따르십시오.
 
-### Prerequisites
+### 전제 조건
 -   Python 3.8+
--   Node.js (for Tailwind CSS CLI, if you wish to modify CSS)
--   `pip` (Python package installer)
+-   Node.js (CSS를 수정하려는 경우 Tailwind CSS CLI용)
+-   `pip` (Python 패키지 설치 프로그램)
 
-### Backend Setup
+### 백엔드 설정
 
-1.  **Navigate to the backend directory:**
+1.  **백엔드 디렉토리로 이동:**
     ```bash
     cd backend
     ```
-2.  **Install Python dependencies:**
+2.  **Python 종속성 설치:**
     ```bash
     pip install -r requirements.txt
     ```
-3.  **Run the Flask application:**
+3.  **Flask 애플리케이션 실행:**
     ```bash
     python app.py
     ```
-    The Flask API will typically run on `http://127.0.0.1:5000`.
+    Flask API는 일반적으로 `http://127.0.0.1:5000`에서 실행됩니다.
 
-### Frontend Setup
+### 프론트엔드 설정
 
-1.  **Navigate back to the project root directory:**
+1.  **프로젝트 루트 디렉토리로 다시 이동:**
     ```bash
     cd ..
     ```
-2.  **Open `index.html` in your web browser.**
-    Alternatively, you can use a simple local web server (e.g., `python -m http.server` in the project root) to serve the static files.
+2.  **웹 브라우저에서 `index.html` 열기.**
+    또는 간단한 로컬 웹 서버(예: 프로젝트 루트에서 `python -m http.server`)를 사용하여 정적 파일을 제공할 수 있습니다.
 
-## 🤝 Contributing
+## 🤝 기여하기
 
-We welcome contributions to enhance the Carbon Footprint Dashboard! Please refer to our `CONTRIBUTING.md` (to be created) for guidelines on how to submit issues, propose features, and contribute code.
+탄소 발자국 대시보드를 향상시키기 위한 기여를 환영합니다! 문제 제출, 기능 제안 및 코드 기여 방법에 대한 지침은 `CONTRIBUTING.md`(생성 예정)를 참조하십시오.
 
-## 📄 License
+## 📄 라이선스
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+이 프로젝트는 MIT 라이선스에 따라 라이선스가 부여됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하십시오.
 
-## 👤 Author
+## 👤 저자
 
 **junny311**
 - GitHub: [ @junny311](https://github.com/junny311)
 - LinkedIn: [linkedin.com/in/yourname](https://linkedin.com/in/yourname)
-- Email: your.email @example.com
+- 이메일: your.email @example.com
