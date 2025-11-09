@@ -48,7 +48,7 @@ Our architecture is designed for scalability, performance, and maintainability, 
    greenery)
 ```
 
-## ✨ Key Features
+## 🔥 Key Features
 
 ### 1. Unified Dashboard
 -   **Real-time KPI Monitoring**: Provides an immediate overview of total emissions, sequestration, net emissions, and daily emission trends.
@@ -131,6 +131,9 @@ We welcome contributions to enhance the Carbon Footprint Dashboard! Please refer
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 📧 Contact
+## 👤 Author
 
-For any inquiries or feedback, please open an issue on this GitHub repository.
+**junny311**
+- GitHub: [ @junny311](https://github.com/junny311)
+- LinkedIn: [linkedin.com/in/yourname](https://linkedin.com/in/yourname)
+- Email: your.email @example.com
