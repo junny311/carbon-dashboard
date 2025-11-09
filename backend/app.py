@@ -3,43 +3,10 @@ from flask_cors import CORS
 import pandas as pd
 import os
 
-app = Flask(__name__, template_folder='.', static_folder='.')
+app = Flask(__name__, template_folder='../frontend', static_folder='../frontend/assets')
 CORS(app)
 
 DATA_DIR = "data"
-
-# HTML 페이지 라우트
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/vehicle')
-def vehicle():
-    return render_template('vehicle.html')
-
-@app.route('/waste')
-def waste():
-    return render_template('waste.html')
-
-@app.route('/water')
-def water():
-    return render_template('water.html')
-
-@app.route('/greenery')
-def greenery():
-    return render_template('greenery.html')
-
-@app.route('/power')
-def power():
-    return render_template('power.html')
-
-@app.route('/macc')
-def macc():
-    return render_template('macc.html')
-
-@app.route('/backend/data/image.png')
-def get_image():
-    return app.send_static_file('backend/data/image.png')
 
 # API: 차량 탄소배출량
 @app.route("/api/emissions/vehicle", methods=['GET'])

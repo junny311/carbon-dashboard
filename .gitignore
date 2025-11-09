@@ -1,0 +1,22 @@
+# Python
+*.pyc
+__pycache__/
+venv/
+env/
+*.egg-info/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Data (민감한 경우)
+# backend/data/*.csv
+
+# Logs
+*.log
