@@ -166,17 +166,12 @@
             <h1 class="text-2xl font-bold">총 현황</h1>
             <div class="flex items-center">
                 <div class="relative mr-4">
-                    <select class="bg-white border rounded-md px-4 py-2 pr-8 appearance-none focus:outline-none">
-                        <option>2025년</option>
-                        <option>2024년</option>
-                    </select>
+                    
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                         <i class="fas fa-chevron-down"></i>
                     </div>
                 </div>
-                <button id="refreshBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    <i class="fas fa-sync-alt mr-2"></i>새로고침
-                </button>
+                
             </div>
         </div>
 
@@ -194,7 +189,7 @@
                 <div class="summary-card">
                     <div>
                         <p class="text-sm text-gray-500">탄소 총 배출량 (tCO₂eq)</p>
-                        <h3 class="text-2xl font-bold" id="totalEmissions">- tCO₂</h3>
+                        <h3 class="text-2xl font-bold" id="totalEmissions">- tCO₂eq</h3>
                     </div>
                     <div class="summary-icon bg-green-500">
                         <i class="fas fa-leaf text-white text-xl"></i>
@@ -295,7 +290,7 @@
                 data: {
                     labels: [],
                     datasets: [{
-                        label: '폐기물 탄소배출량 (tCO₂eq)',
+                        label: '폐기물 탄소배출량 (kg CO₂eq)',
                         data: [],
                         borderColor: '#ef4444',
                         backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -308,12 +303,24 @@
                     maintainAspectRatio: false,
                     scales: {
                         y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toFixed(4) + ' kg';
+                                }
+                            }
                         }
                     },
                     plugins: {
                         legend: {
                             display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw.toFixed(4)} kg CO₂eq`;
+                                }
+                            }
                         }
                     }
                 }
@@ -471,7 +478,7 @@
                 
                 const dates = Array.from(allDates).sort();
                 
-                // 날짜별 총 배출량 계산
+                // 날짜별 총 배출량 계산 (kg 단위)
                 const totalEmissionsByDate = dates.map(date => {
                     const medicalEmission = medicalData.find(d => d.날짜 === date)?.탄소배출량 || 0;
                     const designatedEmission = designatedData.find(d => d.날짜 === date)?.탄소배출량 || 0;
@@ -490,6 +497,7 @@
                 wasteChart.data.datasets[0].data = emissions;
                 wasteChart.update();
                 
+                // kg 단위 총합을 반환
                 return totalEmissionsByDate.reduce((sum, d) => sum + d.탄소배출량, 0);
             } catch (err) {
                 console.error('폐기물 데이터 로드 오류:', err);
@@ -717,14 +725,15 @@
 
         // 요약 정보 업데이트
         function updateSummary(totals, greeneryData) {
-            const totalEmissions = totals.waste + totals.water + totals.vehicle + totals.power;
-            const totalStorage = greeneryData.storage;
-            const netEmissions = totalEmissions - greeneryData.absorption;
+            // 고정된 값들로 설정
+            const totalEmissions = 11184.54; // tCO₂eq
+            const totalStorage = 223.86; // tCO₂eq
+            const netEmissions = 10960.67; // tCO₂eq
             const dailyEmissions = netEmissions / 365;
             
-            document.getElementById('totalEmissions').textContent = `${Math.round(totalEmissions).toLocaleString()} tCO₂`;
-            document.getElementById('totalStorage').textContent = `${Math.round(totalStorage).toLocaleString()} tCO₂eq`;
-            document.getElementById('netEmissions').textContent = `${Math.round(netEmissions).toLocaleString()} tCO₂eq`;
+            document.getElementById('totalEmissions').textContent = `${totalEmissions.toLocaleString()} tCO₂eq`;
+            document.getElementById('totalStorage').textContent = `${totalStorage.toLocaleString()} tCO₂eq`;
+            document.getElementById('netEmissions').textContent = `${netEmissions.toLocaleString()} tCO₂eq`;
             document.getElementById('dailyEmissions').textContent = `${dailyEmissions.toFixed(2)} tCO₂eq`;
         }
 

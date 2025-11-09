@@ -156,11 +156,6 @@
         <!-- 헤더 -->
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-2xl font-bold">전력</h1>
-            <div class="flex items-center">
-                <button id="refreshBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4">
-                    <i class="fas fa-sync-alt mr-2"></i>새로고침
-                </button>
-            </div>
         </div>
 
         <!-- 에러 메시지 -->
@@ -671,8 +666,8 @@
             document.getElementById('annualPowerUsage').textContent = `${Math.round(annualPowerUsage).toLocaleString()} kWh`;
 
             // 연간 탄소 배출량 계산
-            const annualCarbonEmission = data.reduce((sum, item) => sum + (item['탄소배출량'] || 0), 0);
-            document.getElementById('annualCarbonEmission').textContent = `${Math.round(annualCarbonEmission).toLocaleString()} tCO₂eq`;
+            const annualCarbonEmission = data.reduce((sum, item) => sum + (item['탄소배출량']/1000 || 0), 0);
+            document.getElementById('annualCarbonEmission').textContent = `${Math.round(annualCarbonEmission).toLocaleString()} tCO₂`;
 
             // 최대 전력 사용 건물 찾기
             let maxBuilding = '';
@@ -696,9 +691,6 @@
             currentMonth = parseInt(e.target.value);
             updateBuildingMarkers(currentMonth);
         });
-
-        // 새로고침 버튼 이벤트
-        document.getElementById('refreshBtn').addEventListener('click', loadElectricData);
 
         // 초기 로드
         document.addEventListener('DOMContentLoaded', () => {

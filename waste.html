@@ -173,10 +173,7 @@
             <h1 class="text-2xl font-bold">폐기물</h1>
             <div class="flex items-center">
                 <div class="relative mr-4">
-                    <select id="yearSelector" class="bg-white border rounded-md px-4 py-2 pr-8 appearance-none focus:outline-none">
-                        <option value="2025">2025년</option>
-                        <option value="2024">2024년</option>
-                    </select>
+                   
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                         <i class="fas fa-chevron-down"></i>
                     </div>
@@ -212,8 +209,8 @@
                         <i class="fas fa-cloud text-blue-500 text-xl"></i>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-500">연간 탄소 배출량(tCO₂eq)</p>
-                        <h3 class="text-xl font-bold" id="totalEmissions">- tCO₂eq</h3>
+                        <p class="text-sm text-gray-500">연간 탄소 배출량(kg CO₂eq)</p>
+                        <h3 class="text-xl font-bold" id="totalEmissions">- kg CO₂eq</h3>
                     </div>
                 </div>
 
@@ -224,7 +221,7 @@
                     </div>
                     <div>
                         <p class="text-sm text-gray-500">월평균 탄소 배출량</p>
-                        <h3 class="text-xl font-bold" id="avgEmissions">- tCO₂eq</h3>
+                        <h3 class="text-xl font-bold" id="avgEmissions">- kg CO₂eq</h3>
                     </div>
                 </div>
             </div>
@@ -265,7 +262,7 @@
         let medicalWasteChart, designatedWasteChart, industrialWastewaterChart;
 
         function initCharts() {
-            // 공통 툴팁 설정 (소수점 6자리까지 표시)
+            // 공통 툴팁 설정 (kg CO2eq 단위)
             const commonTooltipConfig = {
                 backgroundColor: 'rgba(0, 0, 0, 0.8)',
                 titleFont: {
@@ -284,23 +281,26 @@
                             label += ': ';
                         }
                         if (context.parsed.y !== null) {
-                            // 소수점 6자리까지 표시하되, 불필요한 0은 제거
-                            const value = parseFloat(context.parsed.y.toFixed(6));
-                            label += value + ' tCO₂eq';
+                            // 소수점 4자리까지 표시
+                            const value = parseFloat(context.parsed.y.toFixed(4));
+                            label += value + ' kg CO₂eq';
                         }
                         return label;
                     }
                 }
             };
 
-            // Y축 공통 설정 (소수점 표시 개선)
+            // Y축 공통 설정
             const commonYAxisConfig = {
                 beginAtZero: true,
                 ticks: {
                     callback: function(value) {
-                        // Y축 눈금도 소수점 6자리까지 표시
-                        return parseFloat(value.toFixed(6));
+                        return parseFloat(value.toFixed(4));
                     }
+                },
+                title: {
+                    display: true,
+                    text: 'kg CO₂eq'
                 }
             };
 
@@ -311,7 +311,7 @@
                 data: {
                     labels: [],
                     datasets: [{
-                        label: '의료 폐기물 탄소배출량 (tCO₂eq)',
+                        label: '의료 폐기물 탄소배출량 (kg CO₂eq)',
                         data: [],
                         borderColor: '#ef4444',
                         backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -342,7 +342,7 @@
                 data: {
                     labels: [],
                     datasets: [{
-                        label: '지정 폐기물 탄소배출량 (tCO₂eq)',
+                        label: '지정 폐기물 탄소배출량 (kg CO₂eq)',
                         data: [],
                         borderColor: '#3b82f6',
                         backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -373,7 +373,7 @@
                 data: {
                     labels: [],
                     datasets: [{
-                        label: '산업 폐수 탄소배출량 (tCO₂eq)',
+                        label: '산업 폐수 탄소배출량 (kg CO₂eq)',
                         data: [],
                         borderColor: '#10b981',
                         backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -479,13 +479,13 @@
             const designatedTotal = (data['지정폐기물'] || []).reduce((sum, d) => sum + d['탄소배출량'], 0);
             const industrialTotal = (data['산업폐수'] || []).reduce((sum, d) => sum + d['탄소배출량'], 0);
             
-            // 총 탄소배출량 (소수점 6자리까지 표시)
+            // 총 탄소배출량 (kg CO2eq 단위로 표시)
             const totalEmissions = medicalTotal + designatedTotal + industrialTotal;
-            document.getElementById('totalEmissions').textContent = `${totalEmissions.toFixed(6)} tCO₂eq`;
+            document.getElementById('totalEmissions').textContent = `${totalEmissions.toFixed(4)} kg CO₂eq`;
 
-            // 평균 탄소배출량 (12개월 기준, 소수점 6자리까지)
+            // 평균 탄소배출량 (12개월 기준, kg CO2eq 단위)
             const avgEmissions = totalEmissions / 12;
-            document.getElementById('avgEmissions').textContent = `${avgEmissions.toFixed(6)} tCO₂eq`;
+            document.getElementById('avgEmissions').textContent = `${avgEmissions.toFixed(4)} kg CO₂eq`;
 
             // 총 폐기물량 (추정값)
             document.getElementById('totalWaste').textContent = `100,322 kg`;

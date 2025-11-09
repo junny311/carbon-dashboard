@@ -8,7 +8,7 @@ CORS(app)
 
 DATA_DIR = "data"
 
-# 페이지 라우트들
+# HTML 페이지 라우트
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -41,116 +41,104 @@ def macc():
 def get_image():
     return app.send_static_file('backend/data/image.png')
 
-# API 엔드포인트들
-
-
+# API: 차량 탄소배출량
 @app.route("/api/emissions/vehicle", methods=['GET'])
-def vehicle_emissions_fastapi_converted():
-    filepath = os.path.join(DATA_DIR, "vehicle.csv")
-    if not os.path.exists(filepath):
-        return jsonify({"error": "CSV file not found. Please upload vehicle.csv to data/ folder."}), 404
-
-    df = pd.read_csv(filepath)
+def vehicle_emissions():
+    df = pd.read_csv(os.path.join(DATA_DIR, "vehicle.csv"))
     df["탄소배출량"] = (df["주행거리"] / df["연비"]) * df["배출계수"] * df["차량수"]
     result = df.groupby("날짜")["탄소배출량"].sum().reset_index()
     result["탄소배출량"] = result["탄소배출량"].round(2)
     return jsonify(result.to_dict(orient="records"))
 
+# API: 차량 연료별 탄소배출량
 @app.route("/api/emissions/vehicle/by-fuel", methods=["GET"])
 def vehicle_emissions_by_fuel():
-    filepath = os.path.join(DATA_DIR, "vehicle.csv")
+    df = pd.read_csv(os.path.join(DATA_DIR, "vehicle.csv"))
+    df["탄소배출량"] = (df["주행거리"] / df["연비"]) * df["배출계수"] * df["차량수"]
+    result = df.groupby(["날짜", "연료 종류"])["탄소배출량"].sum().reset_index()
+    result["탄소배출량"] = result["탄소배출량"].round(2)
+    fuel_data = {}
+    for fuel in result["연료 종류"].unique():
+        records = result[result["연료 종류"] == fuel][["날짜", "탄소배출량"]].to_dict(orient="records")
+        if any(record["탄소배출량"] > 0 for record in records):
+            fuel_data[fuel] = records
+    return jsonify(fuel_data)
+
+@app.route("/api/emissions/vehicle/monthly", methods=["GET"])
+def vehicle_emissions_monthly():
+    """vehicle3.csv를 사용한 월별 탄소배출량 계산"""
+    filepath = os.path.join(DATA_DIR, "vehicle3.csv")
     if not os.path.exists(filepath):
-        return jsonify({"error": "CSV file not found."}), 404
+        return jsonify({"error": "vehicle3.csv file not found."}), 404
 
     df = pd.read_csv(filepath)
     df["탄소배출량"] = (df["주행거리"] / df["연비"]) * df["배출계수"] * df["차량수"]
     
-    # 연료별, 날짜별로 그룹화
-    result = df.groupby(["날짜", "연료 종류"])["탄소배출량"].sum().reset_index()
+    # 날짜별로 그룹화하여 월별 총 배출량 계산
+    result = df.groupby("날짜")["탄소배출량"].sum().reset_index()
     result["탄소배출량"] = result["탄소배출량"].round(2)
     
-    # 연료별로 분리하여 반환
-    fuel_data = {}
-    for fuel in result["연료 종류"].unique():
-        fuel_records = result[result["연료 종류"] == fuel][["날짜", "탄소배출량"]].to_dict(orient="records")
-        # 배출량이 0보다 큰 경우만 포함
-        if any(record["탄소배출량"] > 0 for record in fuel_records):
-            fuel_data[fuel] = fuel_records
-    
-    return jsonify(fuel_data)
+    return jsonify(result.to_dict(orient="records"))
 
-    
-
-
+# API: 폐기물 탄소배출량 (CH4를 CO2eq로 변환)
 @app.route("/api/emissions/waste/by-type", methods=["GET"])
 def waste_emissions_by_type():
-    filepath = os.path.join(DATA_DIR, "waste.csv")
-    if not os.path.exists(filepath):
-        return jsonify({"error": "waste.csv 파일이 없습니다."}), 404
-
-    df = pd.read_csv(filepath)
-
-    # 기본값 초기화
+    df = pd.read_csv(os.path.join(DATA_DIR, "waste.csv"))
     df["탄소배출량"] = 0.0
 
-    # 의료폐기물 - 매립
-    mask_med_landfill = (df["종류"] == "의료폐기물") & (df["처리방식"] == "매립")
-    df.loc[mask_med_landfill, "탄소배출량"] = (
-        df.loc[mask_med_landfill, "MSW"] *
-        df.loc[mask_med_landfill, "DOC"] *
-        df.loc[mask_med_landfill, "DOCj"] *
-        df.loc[mask_med_landfill, "MCF"] *
-        df.loc[mask_med_landfill, "F"] *
-        (16 / 12) *
-        (1 - df.loc[mask_med_landfill, "R"])
+    # 의료폐기물 - 매립 (CH4 계산 후 CO2eq로 변환)
+    mask1 = (df["종류"] == "의료폐기물") & (df["처리방식"] == "매립")
+    df.loc[mask1, "탄소배출량"] = (
+        df.loc[mask1, "MSW"] * 
+        df.loc[mask1, "DOC"] * 
+        df.loc[mask1, "DOCj"] * 
+        df.loc[mask1, "MCF"] * 
+        df.loc[mask1, "F"] * 
+        (16 / 12) * 
+        (1 - df.loc[mask1, "R"]) * 
+        28  # CH4를 CO2eq로 변환
     )
 
-    # 의료폐기물 - 소각
-    mask_med_inc = (df["종류"] == "의료폐기물") & (df["처리방식"] == "소각")
-    df.loc[mask_med_inc, "탄소배출량"] = (
-        df.loc[mask_med_inc, "MSW"] *
-        df.loc[mask_med_inc, "소각배출계수"]
+    # 의료폐기물 - 소각 (kg CO2eq로 변환)
+    mask2 = (df["종류"] == "의료폐기물") & (df["처리방식"] == "소각")
+    df.loc[mask2, "탄소배출량"] = (
+        df.loc[mask2, "MSW"] * 
+        df.loc[mask2, "소각배출계수"] * 
+        28  # kg CO2eq로 변환
     )
 
-    # 지정폐기물 (매립)
-    mask_des = (df["종류"] == "지정폐기물")
-    df.loc[mask_des, "탄소배출량"] = (
-        df.loc[mask_des, "MSW"] *
-        df.loc[mask_des, "DOC"] *
-        df.loc[mask_des, "DOCj"] *
-        df.loc[mask_des, "MCF"] *
-        df.loc[mask_des, "F"] *
-        (16 / 12) *
-        (1 - df.loc[mask_des, "R"])
+    # 지정폐기물 (CH4 계산 후 CO2eq로 변환)
+    mask3 = (df["종류"] == "지정폐기물")
+    df.loc[mask3, "탄소배출량"] = (
+        df.loc[mask3, "MSW"] * 
+        df.loc[mask3, "DOC"] * 
+        df.loc[mask3, "DOCj"] * 
+        df.loc[mask3, "MCF"] * 
+        df.loc[mask3, "F"] * 
+        (16 / 12) * 
+        (1 - df.loc[mask3, "R"]) * 
+        28  # CH4를 CO2eq로 변환
     )
 
-    # 산업폐수
-    mask_indus = (df["종류"] == "산업폐수")
-    df.loc[mask_indus, "탄소배출량"] = (
-        df.loc[mask_indus, "TOW"] *
-        df.loc[mask_indus, "EF"] *
-        (1 - df.loc[mask_indus, "R"])
+    # 산업폐수 (CH4 계산 후 CO2eq로 변환)
+    mask4 = (df["종류"] == "산업폐수")
+    df.loc[mask4, "탄소배출량"] = (
+        df.loc[mask4, "TOW"] * 
+        df.loc[mask4, "EF"] * 
+        (1 - df.loc[mask4, "R"]) * 
+        28  # CH4를 CO2eq로 변환
     )
 
-    # 날짜별, 종류별로 그룹화
     result = df.groupby(["날짜", "종류"])["탄소배출량"].sum().reset_index()
     result["탄소배출량"] = result["탄소배출량"].round(4)
-    
-    # 종류별로 분리하여 반환
-    medical_data = result[result["종류"] == "의료폐기물"][["날짜", "탄소배출량"]].to_dict(orient="records")
-    designated_data = result[result["종류"] == "지정폐기물"][["날짜", "탄소배출량"]].to_dict(orient="records")
-    industrial_data = result[result["종류"] == "산업폐수"][["날짜", "탄소배출량"]].to_dict(orient="records")
-    
+
     return jsonify({
-        "의료폐기물": medical_data,
-        "지정폐기물": designated_data,
-        "산업폐수": industrial_data
+        "의료폐기물": result[result["종류"] == "의료폐기물"][["날짜", "탄소배출량"]].to_dict(orient="records"),
+        "지정폐기물": result[result["종류"] == "지정폐기물"][["날짜", "탄소배출량"]].to_dict(orient="records"),
+        "산업폐수": result[result["종류"] == "산업폐수"][["날짜", "탄소배출량"]].to_dict(orient="records")
     })
 
-
-
-
-
+# API: 녹지 탄소 흡수량/저장량
 @app.route("/api/emissions/greenery/details", methods=["GET"])
 def greenery_details():
     result = {
@@ -233,53 +221,26 @@ def greenery_details():
         
     except Exception as e:
         return jsonify({"error": f"데이터 처리 중 오류: {str(e)}"}), 500
-    
+
+# API: 물 사용 탄소배출량
 @app.route("/api/emissions/water", methods=["GET"])
 def water_emissions():
-    filepath = os.path.join(DATA_DIR, "water.csv")
-    if not os.path.exists(filepath):
-        return jsonify({"error": "CSV file not found."}), 404
-
-    df = pd.read_csv(filepath)
-
-    # 탄소배출량 계산
+    df = pd.read_csv(os.path.join(DATA_DIR, "water.csv"))
     df["탄소배출량"] = df["총량"] * df["전력원단위"] * df["배출계수"]
-
     result = df[["날짜", "탄소배출량"]].copy()
     result["탄소배출량"] = result["탄소배출량"].round(2)
     return jsonify(result.to_dict(orient="records"))
 
-
-
+# API: 전력 사용 탄소배출량
 @app.route("/api/emissions/electric/detailed", methods=["GET"])
 def electric_emissions_detailed():
-    filepath = os.path.join(DATA_DIR, "electric.csv")
-    if not os.path.exists(filepath):
-        return jsonify({"error": "electric.csv not found."}), 404
+    df = pd.read_csv(os.path.join(DATA_DIR, "electric.csv"))
+    if '배출계수' in df.columns:
+        df["탄소배출량"] = df["총 사용 전력량"] * df["배출계수"]
+    else:
+        df["탄소배출량"] = df["총 사용 전력량"] * 0.4517  # default 계수
+    return jsonify(df.to_dict(orient="records"))
 
-    try:
-        df = pd.read_csv(filepath)
-        
-        # 데이터 구조 확인을 위한 로그
-        print("CSV columns:", df.columns.tolist())
-        print("CSV shape:", df.shape)
-        print("First row:", df.iloc[0].to_dict() if len(df) > 0 else "No data")
-        
-        # 탄소배출량 계산 (배출계수가 있는 경우)
-        if '배출계수' in df.columns:
-            df["탄소배출량"] = df["총 사용 전력량"] * df["배출계수"]
-        else:
-            # 기본 배출계수 사용 (0.4541 tCO2/MWh)
-            df["탄소배출량"] = df["총 사용 전력량"] * 0.4541
-        
-        # 전체 데이터를 JSON으로 반환
-        result = df.to_dict(orient="records")
-        return jsonify(result)
-        
-    except Exception as e:
-        print(f"Error in electric_emissions_detailed: {str(e)}")
-        return jsonify({"error": f"데이터 처리 중 오류가 발생했습니다: {str(e)}"}), 500
-
-
+# 서버 실행
 if __name__ == '__main__':
     app.run(debug=True, port=5173)

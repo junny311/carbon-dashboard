@@ -196,10 +196,7 @@
             <h1 class="text-2xl font-bold">물</h1>
             <div class="flex items-center">
                 <div class="relative mr-4">
-                    <select class="bg-white border rounded-md px-4 py-2 pr-8 appearance-none focus:outline-none">
-                        <option>2025년</option>
-                        <option>2024년</option>
-                    </select>
+                   
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                         <i class="fas fa-chevron-down"></i>
                     </div>
@@ -260,7 +257,7 @@
             
             <!-- 월별 탄소 배출량 차트 (라인차트 유지) -->
             <div class="card">
-                <h3 class="text-lg font-semibold mb-4">월별 탄소 배출량</h3>
+                <h3 class="text-lg font-semibold mb-4">월별 탄소 배출량 (tCO₂eq)</h3>
                 <div class="h-64">
                     <canvas id="monthlyCarbonEmissions"></canvas>
                 </div>
@@ -339,7 +336,7 @@
                 }
             });
 
-            // 월별 탄소 배출량 차트 (라인차트 유지)
+            // 월별 탄소 배출량 차트 (라인차트 유지) - 톤 단위로 변경
             const carbonEmissionsCtx = document.getElementById('monthlyCarbonEmissions').getContext('2d');
             monthlyCarbonEmissionsChart = new Chart(carbonEmissionsCtx, {
                 type: 'line',
@@ -365,9 +362,13 @@
                     scales: {
                         y: {
                             beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'tCO₂eq'
+                            },
                             ticks: {
                                 callback: function(value) {
-                                    return value.toLocaleString();
+                                    return value.toFixed(3) + ' t'; // 톤 단위 표시
                                 }
                             },
                             grid: {
@@ -398,7 +399,7 @@
                             padding: 12,
                             callbacks: {
                                 label: function(context) {
-                                    return `${context.dataset.label}: ${context.raw.toLocaleString()}`;
+                                    return `${context.dataset.label}: ${context.raw.toFixed(3)} tCO₂eq`;
                                 }
                             }
                         }
@@ -433,7 +434,8 @@
                 const date = new Date(d['날짜']);
                 return `${date.getMonth() + 1}월`;
             });
-            const emissions = data.map(d => d['탄소배출량']);
+            // kg에서 톤으로 변환 (1000으로 나누기)
+            const emissions = data.map(d => d['탄소배출량'] / 1000);
             
             // 월별 탄소 배출량 차트 업데이트
             monthlyCarbonEmissionsChart.data.labels = dates;
@@ -445,7 +447,8 @@
             // 전력원단위 = 0.3265, 배출계수 = 0.4541
             const powerUnit = 0.3265;
             const emissionFactor = 0.4541;
-            const waterUsage = emissions.map(emission => Math.round(emission / (powerUnit * emissionFactor)));
+            // 원래 kg 단위의 배출량 사용
+            const waterUsage = data.map(d => Math.round(d['탄소배출량'] / (powerUnit * emissionFactor)));
             
             monthlyWaterUsageChart.data.labels = dates;
             monthlyWaterUsageChart.data.datasets[0].data = waterUsage;
@@ -453,18 +456,19 @@
         }
 
         function updateSummary(data) {
-            // 총 탄소배출량
-            const totalEmissions = data.reduce((sum, d) => sum + d['탄소배출량'], 0);
-            document.getElementById('totalEmissions').textContent = `${totalEmissions.toFixed(2)} tCO₂eq`;
+            // 총 탄소배출량 (kg에서 톤으로 변환)
+            const totalEmissions = data.reduce((sum, d) => sum + d['탄소배출량'], 0) / 1000;
+            document.getElementById('totalEmissions').textContent = `${totalEmissions.toFixed(3)} tCO₂eq`;
 
-            // 평균 탄소배출량
+            // 평균 탄소배출량 (kg에서 톤으로 변환)
             const avgEmissions = totalEmissions / data.length;
-            document.getElementById('avgEmissions').textContent = `${avgEmissions.toFixed(2)} tCO₂eq`;
+            document.getElementById('avgEmissions').textContent = `${avgEmissions.toFixed(3)} tCO₂eq`;
 
-            // 총 사용량 (역산)
+            // 총 사용량 (역산) - 원래 kg 단위 데이터 사용
             const powerUnit = 0.3265;
             const emissionFactor = 0.4541;
-            const totalUsage = Math.round(totalEmissions / (powerUnit * emissionFactor));
+            const totalUsageKg = data.reduce((sum, d) => sum + d['탄소배출량'], 0);
+            const totalUsage = Math.round(totalUsageKg / (powerUnit * emissionFactor));
             document.getElementById('totalUsage').textContent = `${totalUsage.toLocaleString()} L`;
         }
 

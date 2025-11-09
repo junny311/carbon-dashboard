@@ -200,17 +200,12 @@
             <h1 class="text-2xl font-bold">차량</h1>
             <div class="flex items-center">
                 <div class="relative mr-4">
-                    <select id="yearSelector" class="bg-white border rounded-md px-4 py-2 pr-8 appearance-none focus:outline-none">
-                        <option value="2025">2025년</option>
-                        <option value="2024">2024년</option>
-                    </select>
+                    
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                         <i class="fas fa-chevron-down"></i>
                     </div>
                 </div>
-                <button id="refreshBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    <i class="fas fa-sync-alt mr-2"></i>새로고침
-                </button>
+               
             </div>
         </div>
 
@@ -230,7 +225,7 @@
                     </div>
                     <div class="summary-text">
                         <h3>한달 차량 대수</h3>
-                        <p id="totalVehicles">-999</p>
+                        <p id="totalVehicles">-</p>
                     </div>
                 </div>
                 <div class="summary-card">
@@ -408,12 +403,19 @@
         async function loadData() {
             try {
                 document.getElementById('loading').style.display = 'flex';
-                const res = await fetch(`/api/emissions/vehicle`);
-                if (!res.ok) throw new Error('데이터를 불러오는 중 오류가 발생했습니다.');
-                const data = await res.json();
+                
+                // 일별 데이터 로드 (기존 vehicle.csv)
+                const dailyRes = await fetch(`/api/emissions/vehicle`);
+                if (!dailyRes.ok) throw new Error('일별 데이터를 불러오는 중 오류가 발생했습니다.');
+                const dailyData = await dailyRes.json();
 
-                updateCharts(data);
-                updateSummary(data);
+                // 월별 데이터 로드 (새로운 vehicle3.csv)
+                const monthlyRes = await fetch(`/api/emissions/vehicle/monthly`);
+                if (!monthlyRes.ok) throw new Error('월별 데이터를 불러오는 중 오류가 발생했습니다.');
+                const monthlyData = await monthlyRes.json();
+
+                updateCharts(dailyData, monthlyData);
+                updateSummary(dailyData, monthlyData);
 
                 // 연료별 데이터 로드 시도
                 const fuelData = await loadFuelData();
@@ -433,66 +435,24 @@
             }
         }
 
-        // CSV 원본 데이터에서 차량수 계산
-        async function loadVehicleCount() {
-            try {
-                const res = await fetch('/vehicle.csv');
-                if (res.ok) {
-                    const csvText = await res.text();
-                    const lines = csvText.split('\n');
-                    const headers = lines[0].split(',');
-                    
-                    let totalVehicles = 0;
-                    let dailyVehicles = {};
-                    
-                    for (let i = 1; i < lines.length; i++) {
-                        if (lines[i].trim()) {
-                            const values = lines[i].split(',');
-                            const date = values[0];
-                            const vehicleCount = parseInt(values[5]) || 0;
-                            
-                            totalVehicles += vehicleCount;
-                            
-                            if (!dailyVehicles[date]) {
-                                dailyVehicles[date] = 0;
-                            }
-                            dailyVehicles[date] += vehicleCount;
-                        }
-                    }
-                    
-                    const avgDailyVehicles = Math.round(totalVehicles / Object.keys(dailyVehicles).length);
-                    document.getElementById('totalVehicles').textContent = `${avgDailyVehicles.toLocaleString()}대`;
-                    
-                    // 셔틀버스 배출량 고정값 설정
-                    const shuttleEmissionsKg = 8740.59703;
-                    const shuttleEmissionsTco2 = shuttleEmissionsKg / 1000;
-                    document.getElementById('shuttleEmissions').textContent = `${shuttleEmissionsTco2.toFixed(2)} tCO₂eq/년`;
-                }
-            } catch (err) {
-                console.log('차량수 데이터 로드 실패:', err);
-                document.getElementById('totalVehicles').textContent = `-`;
-                document.getElementById('shuttleEmissions').textContent = `8.74 tCO₂eq/년`;
-            }
-        }
-
-        function updateCharts(data) {
-            // 일별
-            const dates = data.map(d => d['날짜']);
-            const values = data.map(d => d['탄소배출량']);
+        function updateCharts(dailyData, monthlyData) {
+            // 일별 차트 업데이트 (기존 vehicle.csv 데이터)
+            const dates = dailyData.map(d => d['날짜']);
+            const values = dailyData.map(d => d['탄소배출량']);
             dailyEmissionsChart.data.labels = dates;
             dailyEmissionsChart.data.datasets[0].data = values;
             dailyEmissionsChart.update();
 
-            // 월별
-            const monthlyMap = {};
-            data.forEach(d => {
-                const m = d['날짜'].slice(0,7);
-                monthlyMap[m] = (monthlyMap[m]||0) + d['탄소배출량'];
+            // 월별 차트 업데이트 (새로운 vehicle3.csv 데이터)
+            const monthlyDates = monthlyData.map(d => {
+                // 날짜를 월 형식으로 변환 (예: "2024-03-01" -> "3월")
+                const date = new Date(d['날짜']);
+                return `${date.getMonth() + 1}월`;
             });
-            const months = Object.keys(monthlyMap).sort();
-            const monthVals = months.map(m => monthlyMap[m]);
-            monthlyEmissionsChart.data.labels = months;
-            monthlyEmissionsChart.data.datasets[0].data = monthVals;
+            const monthlyValues = monthlyData.map(d => d['탄소배출량']);
+            
+            monthlyEmissionsChart.data.labels = monthlyDates;
+            monthlyEmissionsChart.data.datasets[0].data = monthlyValues;
             monthlyEmissionsChart.update();
         }
 
@@ -554,18 +514,19 @@
             ctx.fillText('app.py에 /api/emissions/vehicle/by-fuel API 추가 필요', canvas.width / 2, canvas.height / 2 + 20);
         }
 
-        function updateSummary(data) {
-            // 평균 일간 배출량
-            const total = data.reduce((s, d) => s + d['탄소배출량'], 0);
-            const avgDaily = (data.length ? total / data.length : 0).toFixed(2);
+        function updateSummary(dailyData, monthlyData) {
+            // 평균 일간 배출량 (기존 일별 데이터 기준)
+            const dailyTotal = dailyData.reduce((s, d) => s + d['탄소배출량'], 0);
+            const avgDaily = (dailyData.length ? dailyTotal / dailyData.length : 0).toFixed(2);
             document.getElementById('dailyEmissions').textContent = `${avgDaily} tCO₂eq`;
 
-            // 총 월간 배출량
-            document.getElementById('monthlyEmissions').textContent = `${total.toFixed(2)} tCO₂eq`;
+            // 총 월간 배출량 (새로운 월별 데이터 기준)
+            const monthlyTotal = monthlyData.reduce((s, d) => s + d['탄소배출량'], 0);
+            document.getElementById('monthlyEmissions').textContent = `${monthlyTotal.toFixed(2)} tCO₂eq`;
 
             // 하드코딩 값들
             document.getElementById('totalVehicles').textContent = `97034대`;
-            document.getElementById('shuttleEmissions').textContent = `8.74 tCO₂eq/년`;
+            document.getElementById('shuttleEmissions').textContent = `5.1 tCO₂eq/년`;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
